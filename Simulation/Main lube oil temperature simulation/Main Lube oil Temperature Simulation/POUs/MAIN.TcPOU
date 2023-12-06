@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{bfb45728-faeb-43cc-a476-91bb318fccc4}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+
+VAR
+	fb_MainLubeOilReservoirTemperature : FB_ReservoirTemperature ;
+	fb_MainLubeOilReservoirHeaterIsOn : FB_ReservoirHeaterIsOn ;
+	fb_MainLubeOilTemperatureAfterPump : FB_TemperatureAfterPump ;
+	fb_MainLubeOilTemperatureAfterHeatExchanger : FB_TemperatureAfterHeatExchanger ;
+	fb_MainLubeOilTemperatureAfterGearbox : FB_TemperatureAfterGearbox ;
+	fb_MainLubeOilReservoirVolume : FB_ReservoirVolume ;
+	fb_MainLubeOilPumpFlow : FB_PumpFlow ;
+	
+	MainLubeOilReservoirTemperature : REAL := simulation_parameters.AmbientTemperature; // Celcius
+	MainLubeOilTemperatureAfterPump : REAL := simulation_parameters.AmbientTemperature ; // Celcius
+	MainLubeOilTemperatureAfterHeatExchanger : REAL := simulation_parameters.AmbientTemperature ; // Celcius
+	MainLubeOilTemperatureAfterGearbox : REAL :=simulation_parameters.AmbientTemperature ; // Celcius
+
+	MainLubeOilReservoirVolume : REAL := MainLubeOil_Parameters.MainLubeOilReservoirVolume; // L
+	MainLubeOilPumpFlow  :  REAL := 0 ; // L/s
+	MainLubeOilCurrentPipeVolume : REAL := 0 ; //L
+
+	BoolSimulationTesting : BOOL := FALSE ;
+	MainLubeOilReservoirHeaterIsOn : BOOL ;
+	MainLubeOilPumpOneOn : BOOL := FALSE ;
+	MainLubeOilPumpTwoOn : BOOL := FALSE ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fb_MainLubeOilReservoirVolume(	ReservoirVolume := MainLubeOilReservoirVolume,
+								ReservoirStartVolume := MainLubeOil_Parameters.MainLubeOilReservoirVolume,
+								TotalPipeVolume := MainLubeOil_Parameters.MainLubeOilTotalPipeVolume,
+								PumpFlow := MainLubeOilPumpFlow);
+
+fb_MainLubeOilPumpFlow(	PumpOneOn := MainLubeOilPumpOneOn, 
+						PumpTwoOn := MainLubeOilPumpTwoOn) ;
+	
+fb_MainLubeOilReservoirTemperature(	ReservoirVolume := MainLubeOilReservoirVolume,
+									ReservoirHeaterIsOn := MainLubeOilReservoirHeaterIsOn,
+									TotalPipeVolume := MainLubeOil_Parameters.MainLubeOilTotalPipeVolume,
+									CurrentPipeVolume := MainLubeOilCurrentPipeVolume,
+									TemperatureAfterGearbox := MainLubeOilTemperatureAfterGearbox);
+
+									
+fb_MainLubeOilReservoirHeaterIsOn(ReservoirTemperature := MainLubeOilReservoirTemperature,
+								ReservoirHeaterIsOn := MainLubeOilReservoirHeaterIsOn,
+								ReservoirHeaterSPon := MainLubeOil_Parameters.MainLubeOilReservoirHeaterSPon,
+								ReservoirHeaterSPoff := MainLubeOil_Parameters.MainLubeOilReservoirHeaterSPoff,
+								BoolSimulationTesting := BoolSimulationTesting);
+								
+fb_MainLubeOilTemperatureAfterPump(	TemperatureBeforePump := MainLubeOilReservoirTemperature, 
+									PumpPower := MainLubeOil_Parameters.MainLubeOilPumpPower,
+									PumpFlow := MainLubeOilPumpFlow,
+									Density := simulation_parameters.OilDensity,
+									SpecificHeatCapacity := simulation_parameters.SpecificHeatCapacityOil,
+									PumpEfficiency := MainLubeOil_Parameters.MainLubeOilPumpEfficiency)	;				
+
+fb_MainLubeOilTemperatureAfterHeatExchanger(TemperatureBeforeHeatExchanger:= MainLubeOilTemperatureAfterPump,
+											HeatExchangerPower := MainLubeOil_Parameters.MainLubeOilHeatExchangerPower ,
+											PumpFlow := MainLubeOilPumpFlow,
+											Density := Simulation_Parameters.OilDensity,
+											SpecificHeatCapacity := Simulation_Parameters.SpecificHeatCapacityOil,
+											Heatexchangervalveclosedtemp :=MainLubeOil_Parameters.MainLubeOilHeatExchangerValveClosedTemp ,
+											HeatExchangerValveOpenTemp := MainLubeOil_Parameters.MainLubeOilHeatExchangerValveOpenTemp,
+											TotalPipeVolume := MainLubeOil_Parameters.MainLubeOilTotalPipeVolume,
+											CurrentPipeVolume := MainLubeOilCurrentPipeVolume,
+											BoolSimulationTesting := BoolSimulationTesting);
+
+fb_MainLubeOilTemperatureAfterGearbox(	TemperatureBeforeGearbox:= MainLubeOilTemperatureAfterHeatexchanger,
+										PumpFlow := MainLubeOilPumpFlow,
+										Density := Simulation_Parameters.OilDensity,
+										SpecificHeatCapacity := Simulation_Parameters.SpecificHeatCapacityOil,
+										GearboxEfficiency := MainLubeOil_Parameters.MainLubeOilGearboxEfficiency,
+										Gearboxheat := MainLubeOil_Parameters.MainLubeOilGearboxHeat,
+										GearboxStandardHeat := MainLubeOil_Parameters.MainLubeOilGearboxStandardHeat,
+										TotalPipeVolume := MainLubeOil_Parameters.MainLubeOilTotalPipeVolume,
+										CurrentPipeVolume := MainLubeOilCurrentPipeVolume,
+										BoolSimulationTesting := BoolSimulationTesting);								
+								
+MainLubeOilReservoirTemperature := fb_MainLubeOilReservoirTemperature.ReservoirTemperature ;
+MainLubeOilReservoirHeaterIsOn := fb_MainLubeOilReservoirHeaterIsOn.ReservoirHeaterIsOn ;
+MainLubeOilTemperatureAfterPump := fb_MainLubeOilTemperatureAfterPump.TemperatureAfterPump ;
+MainLubeOilTemperatureAfterHeatExchanger := fb_MainLubeOilTemperatureAfterHeatExchanger.TemperatureAfterHeatexchanger ;
+MainLubeOilTemperatureAfterGearbox := fb_MainLubeOilTemperatureAfterGearbox.TemperatureAfterGearbox ;
+MainLubeOilReservoirVolume := fb_MainLubeOilReservoirVolume.ReservoirVolume ;
+MainLubeOilCurrentPipeVolume := fb_MainLubeOilReservoirVolume.CurrentPipeVolume ;
+MainLubeOilPumpFlow := fb_MainLubeOilPumpFlow.PumpFlow ;
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="133" Count="0" />
+      <LineId Id="136" Count="1" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="178" Count="1" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="248" Count="0" />
+      <LineId Id="217" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="219" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="51" Count="4" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="62" Count="2" />
+      <LineId Id="66" Count="2" />
+      <LineId Id="172" Count="1" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="76" Count="1" />
+      <LineId Id="79" Count="5" />
+      <LineId Id="175" Count="0" />
+      <LineId Id="174" Count="0" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="171" Count="0" />
+      <LineId Id="169" Count="0" />
+      <LineId Id="253" Count="0" />
+      <LineId Id="252" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TemperatureAfterHeatExchanger" Id="{b4443b5f-ee70-4733-9d71-85033ba98cb5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TemperatureAfterHeatExchanger
+VAR_INPUT
+	TemperatureBeforeHeatExchanger : REAL ; // Celsius
+	HeatExchangerPower : REAL ; // Watt
+	PumpFlow : REAL ; // L/s
+	Density : REAL ; // g/L
+	SpecificHeatCapacity : REAL ; // j/(g C)
+	
+	HeatExchangerValveClosedTemp : REAL ; // Celsius
+	HeatExchangerValveOpenTemp : REAL ; // Celsius
+	TotalPipeVolume : REAL ; // L
+	CurrentPipeVolume : REAL ; // L
+	BoolSimulationTesting : BOOL ;
+END_VAR
+VAR_OUTPUT
+	TemperatureAfterHeatExchanger : REAL := Simulation_Parameters.AmbientTemperature; // Celcius
+END_VAR
+VAR
+	HeatExchangerValvePercentageOpen : REAL ; //% 0-1
+	HeatExchangerValveMaxOpen : REAL := 1; //1 = 100%
+	HeatExchangerValveMinOpen : REAL := 0; //0 = 0%
+	deltaTByHeatExchanger : REAL ; // Celcius
+	
+	MimimumPipeVolumeForHeatTransfer : REAL ; // L
+	TemperatureAfterHeatExchangerNonFiltered : REAL ; // Celcius
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT BoolSimulationTesting THEN
+	IF TemperatureBeforeHeatExchanger < HeatExchangerValveClosedTemp THEN
+		HeatExchangerValvePercentageOpen :=0 ;
+	ELSIF TemperatureBeforeHeatExchanger > HeatExchangerValveOpenTemp THEN
+		HeatExchangerValvePercentageOpen :=100 ;
+	ELSE 
+		HeatExchangerValvePercentageOpen := F_Scale(inputValue :=TemperatureBeforeHeatExchanger,
+													inputMaxValue := HeatExchangerValveOpenTemp,
+													InputMinValue := HeatExchangerValveClosedTemp,
+													inputScaleMaxLimit := HeatExchangerValveMaxOpen,
+													inputScaleMinLimit := HeatExchangerValveMinOpen);
+	END_IF
+ELSE
+	//HeatExchangerValvePercentageOpen value of PLC simulation
+END_IF
+
+MimimumPipeVolumeForHeatTransfer := TotalPipeVolume/4;
+IF CurrentPipeVolume <= MimimumPipeVolumeForHeatTransfer THEN
+	deltaTByHeatExchanger := 0 ;
+ELSE 
+	deltaTByHeatExchanger := f_CalculateDeltaT(SpecificHeatCapacity := SpecificHeatCapacity,
+												Density := Density,
+												Mass := PumpFlow,
+												PowerInput := HeatExchangerPower);
+								
+	TemperatureAfterHeatExchangerNonFiltered := TemperatureBeforeHeatExchanger - ( (HeatExchangerValvePercentageOpen) * deltaTByHeatExchanger ) ;
+	TemperatureAfterHeatExchanger := (1-simulation_parameters.TimeConstantHeatExchanger)*TemperatureAfterHeatExchanger + simulation_parameters.TimeConstantHeatExchanger*TemperatureAfterHeatExchangerNonFiltered ;
+END_IF
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TemperatureAfterHeatExchanger">
+      <LineId Id="120" Count="0" />
+      <LineId Id="123" Count="9" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="134" Count="1" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TemperatureAfterPump" Id="{39262604-a14f-4fa1-8253-59e191ff3684}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TemperatureAfterPump
+VAR_INPUT
+	TemperatureBeforePump : REAL ; // Celcius
+	PumpPower : REAL ; // Watt
+	PumpFlow : REAL ; // L/s
+	Density : REAL ; // g/L
+	SpecificHeatCapacity : REAL ; //  j/(g C)
+	PumpEfficiency : REAL ; //% 0-1
+END_VAR
+VAR_OUTPUT
+	TemperatureAfterPump : REAL := Simulation_Parameters.AmbientTemperature ; // Celcius
+END_VAR
+VAR
+	deltaTByPump : REAL ; // Celcius
+	TemperatureAfterPumpNonFiltered : REAL ; //Celcius
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF PumpFlow = 0 THEN
+	;
+ELSE
+	deltaTByPump := f_CalculateDeltaT(	SpecificHeatCapacity := SpecificHeatCapacity,
+									Density := Density,
+									Mass := PumpFlow,
+									PowerInput := PumpPower);
+					
+	TemperatureAfterPumpNonFiltered := TemperatureBeforePump + ( (1 - PumpEfficiency) * deltaTByPump ) ;	
+	TemperatureAfterPump := (1-simulation_parameters.TimeConstantPump)*TemperatureAfterPump + simulation_parameters.TimeConstantPump*TemperatureAfterPumpNonFiltered ;
+END_IF
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TemperatureAfterPump">
+      <LineId Id="75" Count="1" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="80" Count="5" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="MainLubeOil_Parameters" Id="{fbe03f8a-f3f9-4865-9343-5792a4df6870}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	MainLubeOilReservoirVolume : REAL := 900 ; //Liters
+	MainLubeOilTotalPipeVolume: REAL := 150 ; //Liters
+	
+	MainLubeOilReservoirHeaterPower : REAL := 5000 ; //Watt
+	MainLubeOilReservoirHeaterSPon :  REAL := 40 ; // Celcius
+	MainLubeOilReservoirHeaterSPoff :  REAL := 50 ; // Celcius
+	
+	MainLubeOilHeatExchangerPower :  REAL := 50000 ; //Watt
+	MainLubeOilHeatExchangerValveClosedTemp :  REAL := 40 ; //Celcius, Valve 0% no cooling
+	MainLubeOilHeatExchangerValveOpenTemp :  REAL := 80 ; //Celcius Valve 100% max cooling
+	
+	
+	MainLubeOilPumpPower  :  REAL := 5000 ; //Watt
+	MainLubeOilPumpEfficiency :  REAL := 0.95 ; // % formatted as a decimal
+	
+	MainLubeOilGearboxHeat :  REAL := 5000000 ; // Watt
+	MainLubeOilGearboxEfficiency :  REAL := 0.993 ; // % formatted as a deimal number
+	MainLubeOilGearboxStandardHeat :  REAL := 1000 ; // Watt
+	
+END_VAR
+]]></Declaration>
+  </GVL>
+</TcPlcObject>

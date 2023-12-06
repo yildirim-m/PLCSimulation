@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="f_CalculateDeltaT" Id="{67e8c0c9-d26a-4619-ac85-2e802df4f70d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION f_CalculateDeltaT : REAL
+
+VAR_INPUT
+	PowerInput : REAL ; // Watts
+	Density : REAL ; // g/L
+	SpecificHeatCapacity : REAL ; // j/(g C)
+	Mass : REAL; // g
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF Density =0 OR SpecificHeatCapacity =0 OR Mass =0 THEN 
+	f_CalculateDeltaT := 0 ; 
+ELSIF Mass < 0.3 THEN  //Filter to prevent large spikes when dividing by very small mass numbers.
+	f_CalculateDeltaT := 0 ; 
+ELSE
+	f_CalculateDeltaT := PowerInput / (Density * SpecificHeatCapacity * Mass);
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="f_CalculateDeltaT">
+      <LineId Id="34" Count="0" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="36" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

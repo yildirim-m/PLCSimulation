@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="f_deltaT_AfterMixingTwoFluids" Id="{1fbd8df4-eb2d-4998-932b-8bb97d8e0f5e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION f_deltaT_AfterMixingTwoFluids : REAL
+VAR_INPUT
+	Mass1 : REAL ; // g
+	SpecificHeatCapacity1 : REAL ; //  j/(g C), 
+	Temperature1 : REAL ; // Celcius
+	
+	Mass2 : REAL ; // g
+	SpecificHeatCapacity2 : REAL ; //  j/(g C), 
+	Temperature2 : REAL ; // Celcius
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[f_deltaT_AfterMixingTwoFluids := ((Mass1 * SpecificHeatCapacity1 * Temperature1)+(Mass2 * SpecificHeatCapacity2 * Temperature2))/((Mass1 * SpecificHeatCapacity1 )+(Mass2 * SpecificHeatCapacity2 )) - Temperature2;]]></ST>
+    </Implementation>
+    <LineIds Name="f_deltaT_AfterMixingTwoFluids">
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

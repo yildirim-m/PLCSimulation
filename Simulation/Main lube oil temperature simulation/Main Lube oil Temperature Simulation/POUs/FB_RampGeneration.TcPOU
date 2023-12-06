@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_RampGeneration" Id="{b326c7de-8336-4158-9951-98f1784e2af3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RampGeneration
+VAR_INPUT
+RampStart : REAL ; //Start value of ramp
+RampTarget : REAL ; //Target Value of ramp
+RampTimeStep : REAL ; //100ms call
+RampFactor : REAL ; //Units added
+END_VAR
+
+VAR_OUTPUT
+RampOutput : REAL ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF RampStart < RampTarget THEN
+	RampStart := RampStart + (RampFactor * RampTimeStep) ;
+	IF (RampStart > RampTarget) THEN
+		RampStart := RampTarget ;
+	END_IF
+END_IF 
+
+IF RampStart > RampTarget THEN  
+	RampStart := RampStart - (RampFactor * RampTimeStep) ;
+	IF (RampStart < RampTarget) THEN
+		RampStart := RampTarget;
+	END_IF
+END_IF
+
+RampOutput := RampStart ;
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_RampGeneration">
+      <LineId Id="29" Count="1" />
+      <LineId Id="101" Count="3" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="105" Count="3" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

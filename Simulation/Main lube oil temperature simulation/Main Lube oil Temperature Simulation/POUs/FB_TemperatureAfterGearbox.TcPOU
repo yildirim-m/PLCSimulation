@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TemperatureAfterGearbox" Id="{26c4ff50-fec5-40fc-8b57-ba9d53fbda82}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TemperatureAfterGearbox
+VAR_INPUT
+	TemperatureBeforeGearbox : REAL ; // Celcius
+	PumpFlow : REAL ; // L/s
+	Density : REAL ; // g/L
+	SpecificHeatCapacity : REAL ; //  j/(g C) 
+	GearboxEfficiency : REAL ; //%, 0-1
+	Gearboxheat : REAL ; // Watt
+	GearboxStandardHeat : REAL ; // Watt
+	TotalPipeVolume : REAL ; // L
+	CurrentPipeVolume : REAL ; // L
+	BoolSimulationTesting : BOOL ;
+END_VAR
+VAR_OUTPUT
+	TemperatureAfterGearbox : REAL := Simulation_Parameters.AmbientTemperature ; // L
+END_VAR
+VAR
+	SurgeValvePosition : REAL ; // % 0-1
+	deltaTByGearboxHeat : REAL ; // Celsius
+	deltaTByGearboxStandardHeat : REAL ; // Celsius
+	deltaTByGearboxHeatEfficiencyCorrected : REAL ; // Celsius
+	
+	MimimumPipeVolumeForHeatTransfer : REAL ; // L
+	TemperatureAfterGearboxNonFiltered : REAL ; // Celsius
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT BoolSimulationTesting THEN
+	SurgeValvePosition := 0.05; //Use hardcoded SurgeValvePosition
+ELSE
+	; //Frank Logic for SurgeValvePosition.
+END_IF
+
+
+MimimumPipeVolumeForHeatTransfer := TotalPipeVolume*3/4;
+
+IF CurrentPipeVolume <= MimimumPipeVolumeForHeatTransfer THEN
+	deltaTByGearboxHeat := 0 ;
+	deltaTByGearboxStandardHeat := 0 ;
+	
+ELSE 
+	deltaTByGearboxHeat := f_CalculateDeltaT(SpecificHeatCapacity := SpecificHeatCapacity,
+											Density := Density,
+											Mass := PumpFlow,
+											PowerInput := Gearboxheat);
+								
+	deltaTByGearboxStandardHeat := f_CalculateDeltaT(SpecificHeatCapacity := SpecificHeatCapacity,
+													Density := Density,
+													Mass := PumpFlow,
+													PowerInput := GearboxStandardHeat); 
+	deltaTByGearboxHeatEfficiencyCorrected := (1-GearboxEfficiency) * deltaTByGearboxHeat;
+						
+	TemperatureAfterGearboxNonFiltered := TemperatureBeforeGearbox + (SurgeValvePosition *  deltaTByGearboxHeatEfficiencyCorrected) + deltaTByGearboxStandardHeat;
+	TemperatureAfterGearbox := (1-simulation_parameters.TimeConstantGearbox)*TemperatureAfterGearbox + simulation_parameters.TimeConstantGearbox*TemperatureAfterGearboxNonFiltered ;
+
+END_IF
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TemperatureAfterGearbox">
+      <LineId Id="17" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="122" Count="1" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="118" Count="1" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="116" Count="0" />
+      <LineId Id="66" Count="1" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="75" Count="6" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="85" Count="1" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="90" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

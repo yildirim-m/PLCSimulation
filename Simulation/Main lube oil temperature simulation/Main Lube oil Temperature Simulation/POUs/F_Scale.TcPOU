@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="F_Scale" Id="{49775636-e960-4359-8a08-12d42221b5ac}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_Scale : REAL
+
+VAR_INPUT
+	inputValue : REAL;
+	inputMaxValue : REAL;
+	inputMinValue : REAL;
+	inputScaleMaxLimit : REAL; 
+	inputScaleMinLimit : REAL;
+END_VAR
+
+VAR
+	fNormalizedValue : REAL :=0;
+	fScaledValue : REAL := 0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Normalize the  input
+IF inputValue < inputMinValue THEN
+	fNormalizedValue := 0;
+ELSIF inputValue > 	inputMaxValue THEN
+	fNormalizedValue := 1;
+ELSE
+	fNormalizedValue := (inputValue - inputMinValue) / (inputMaxValue - inputMinValue);
+END_IF
+
+//Scale the output
+F_Scale := fNormalizedValue * (inputScaleMaxLimit - inputScaleMinLimit) + inputScaleMinLimit;]]></ST>
+    </Implementation>
+    <LineIds Name="F_Scale">
+      <LineId Id="30" Count="10" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="Simulation_Parameters" Id="{8a93ba53-12d8-4e2e-8915-3e700f98c1d3}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	OilDensity : REAL := 865 ; // g/L
+	SpecificHeatCapacityOil : REAL := 2 ; // j/(g C)
+	
+	AmbientTemperature : REAL := 15 ; //Celcius
+	GravityOilFlow : REAL := 1 ; // L/s
+	CycleTime : REAL := 0.010 ; // s , 10 ms
+
+END_VAR
+VAR_GLOBAL
+	TimeConstantReservoir : REAL := 0.1 ;
+	TimeConstantPump : REAL := 0.0001 ;
+	TimeConstantHeatExchanger : REAL := 0.0001 ;
+	TimeConstantGearbox : REAL := 0.0001 ;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

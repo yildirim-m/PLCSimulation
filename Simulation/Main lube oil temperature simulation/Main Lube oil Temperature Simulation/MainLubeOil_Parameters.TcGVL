@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="MainLubeOil_Parameters" Id="{4fdcf92b-ea4a-4ca4-9e52-2513a5d9033a}" ParameterList="True">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	MainLubeOilReservoirVolume : REAL := 900 ; //Liters
+	MainLubeOilPipeVolume: REAL := 150 ; //Liters
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

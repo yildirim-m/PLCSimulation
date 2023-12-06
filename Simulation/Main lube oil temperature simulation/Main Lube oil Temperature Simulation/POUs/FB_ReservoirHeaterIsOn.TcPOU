@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ReservoirHeaterIsOn" Id="{5134fce4-4bf6-4059-be17-cc9309695c95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ReservoirHeaterIsOn
+VAR_INPUT
+	ReservoirTemperature : REAL ; // Celcius
+	ReservoirHeaterIsOn : BOOL ; 
+	ReservoirHeaterSPon : REAL ; // Celcius
+	ReservoirHeaterSPoff : REAL ; // Celcius
+	BoolSimulationTesting : BOOL ; //True if testing with PLC logic
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT BoolSimulationTesting THEN
+	IF (ReservoirTemperature < ReservoirHeaterSPon) THEN
+		ReservoirHeaterIsOn := TRUE ; 
+	ELSIF ((ReservoirTemperature > ReservoirHeaterSPon) AND (ReservoirTemperature < ReservoirHeaterSPoff)) AND ReservoirHeaterIsOn THEN
+		ReservoirHeaterIsOn :=TRUE; 
+	ELSIF ((ReservoirTemperature > ReservoirHeaterSPon) AND (ReservoirTemperature < ReservoirHeaterSPoff)) AND NOT ReservoirHeaterIsOn THEN
+		ReservoirHeaterIsOn :=FALSE;
+	ELSIF (ReservoirTemperature > ReservoirHeaterSPoff) THEN
+		ReservoirHeaterIsOn :=FALSE;
+	END_IF
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_ReservoirHeaterIsOn">
+      <LineId Id="36" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="18" Count="1" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="20" Count="1" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="17" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

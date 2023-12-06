@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ReservoirTemperature" Id="{e56d501c-cc3e-4275-8529-bf810e3f994f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ReservoirTemperature
+VAR_INPUT
+	ReservoirVolume : REAL ; // L
+	ReservoirHeaterIsOn : BOOL ;
+	TotalPipeVolume : REAL ; // L
+	CurrentPipeVolume : REAL ; // L
+	TemperatureAfterGearbox : REAL ; //Celcius
+END_VAR
+VAR_OUTPUT
+	ReservoirTemperature : REAL := Simulation_Parameters.AmbientTemperature ; //Celcius
+END_VAR
+VAR
+	deltaTHeater : REAL := 0; // Celcius
+	deltaTMixingGearboxReturn : REAL :=0 ; // Celcius
+	
+	ReservoirTemperatureNonFiltered : REAL := Simulation_Parameters.AmbientTemperature; // Celcius
+	ReservoirConvectionHeat : REAL := 0 ; // Watt
+	deltaTConvection : REAL := 0; // Celcius
+	AmbientTemperature : REAL := Simulation_Parameters.AmbientTemperature; // Celcius
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF CurrentPipeVolume < (TotalPipeVolume) THEN
+	deltaTMixingGearboxReturn := 0 ;
+ELSE
+	deltaTMixingGearboxReturn := f_deltaT_AfterMixingTwoFluids(	Mass1 := main.fb_MainLubeOilTemperatureAfterGearbox.PumpFlow,
+																						SpecificHeatCapacity1 := simulation_parameters.SpecificHeatCapacityOil,
+																						Temperature1 := TemperatureAfterGearbox,
+																						Mass2 := ReservoirVolume,
+																						SpecificHeatCapacity2 := simulation_parameters.SpecificHeatCapacityOil,
+																						Temperature2 := ReservoirTemperature);
+END_IF
+
+	
+
+IF ReservoirHeaterIsOn THEN
+	deltaTHeater := f_CalculateDeltaT(	SpecificHeatCapacity := simulation_parameters.SpecificHeatCapacityOil,
+										Density := Simulation_Parameters.OilDensity,
+										Mass := ReservoirVolume,
+										PowerInput := MainLubeoil_parameters.MainLubeOilReservoirHeaterPower);
+ELSIF NOT ReservoirHeaterIsOn  THEN
+	deltaTHeater := 0;
+END_IF
+
+ReservoirConvectionHeat := f_ReservoirConvectionHeat(ReservoirTemperature := ReservoirTemperature,
+														AmbientTemperature := AmbientTemperature) ;
+deltaTConvection := f_CalculateDeltaT (	SpecificHeatCapacity := simulation_parameters.SpecificHeatCapacityOil,
+										Density := Simulation_Parameters.OilDensity,
+										Mass := ReservoirVolume,
+										PowerInput := ReservoirConvectionHeat);
+										
+ReservoirTemperatureNonFiltered := ReservoirTemperature + deltaTHeater + deltaTMixingGearboxReturn - deltaTConvection;
+ReservoirTemperature := (1-simulation_parameters.TimeConstantReservoir)*ReservoirTemperature + simulation_parameters.TimeConstantReservoir*ReservoirTemperatureNonFiltered ;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_ReservoirTemperature">
+      <LineId Id="115" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="124" Count="4" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="85" Count="1" />
+      <LineId Id="169" Count="2" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="93" Count="2" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="168" Count="0" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="172" Count="2" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="176" Count="0" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="136" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

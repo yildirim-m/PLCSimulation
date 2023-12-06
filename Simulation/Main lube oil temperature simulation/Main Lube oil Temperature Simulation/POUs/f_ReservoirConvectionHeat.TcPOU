@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="f_ReservoirConvectionHeat" Id="{d594b84b-0994-40e4-b68c-d2f887787c43}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION f_ReservoirConvectionHeat : REAL
+VAR_INPUT
+	ReservoirTemperature : REAL ; // Celcius
+	AmbientTemperature : REAL ; // Celcius
+END_VAR
+VAR_OUTPUT
+	ReservoirConvectionHeat: REAL ; // Watt
+END_VAR
+VAR
+	ConvectiveHeatTransferCoeff : REAL := 10 ; // Watt/(m2 K)
+	ReservoirSurfaceArea : REAL :=6 ; // m2
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[f_ReservoirConvectionHeat := ConvectiveHeatTransferCoeff * ReservoirSurfaceArea * (ReservoirTemperature - AmbientTemperature);]]></ST>
+    </Implementation>
+    <LineIds Name="f_ReservoirConvectionHeat">
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

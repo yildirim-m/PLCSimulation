@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_PumpFlow" Id="{f144a18f-45e7-40ae-8110-817a4af98e1c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PumpFlow
+VAR_INPUT
+	PumpOneOn : BOOL;
+	PumpTwoOn : BOOL ;
+	PumpFlow : REAL ; // L/s
+END_VAR
+VAR
+	fb_ramp_generation : FB_RampGeneration ;
+	PumpFlowTarget : REAL := 0; // L/s
+	RampTimeStepPumpFlow : REAL :=0.1; //100ms call
+	RampFactorPumpFlow : REAL :=0.3; // Velocity ramp
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (PumpOneOn AND PumpTwoOn) THEN
+	PumpFlowTarget := 6 ;
+
+ELSIF (PumpOneOn OR PumpTwoOn)  THEN
+	PumpFlowTarget :=3 ;
+ELSIF NOT (PumpOneOn AND PumpTwoOn)  THEN
+	PumpFlowTarget :=0;
+END_IF
+
+fb_ramp_generation(RampStart :=PumpFlow, 
+					RampTarget := PumpFlowTarget, 
+					RampTimestep := RampTimeStepPumpFlow, 
+					RampFactor := RampFactorPumpFlow) ;
+pumpflow := fb_ramp_generation.RampOutput ;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_PumpFlow">
+      <LineId Id="10" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="12" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="90" Count="3" />
+      <LineId Id="37" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
