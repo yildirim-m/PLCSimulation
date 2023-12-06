@@ -85,9 +85,7 @@ MainLubeOilTemperatureAfterHeatExchanger := fb_MainLubeOilTemperatureAfterHeatEx
 MainLubeOilTemperatureAfterGearbox := fb_MainLubeOilTemperatureAfterGearbox.TemperatureAfterGearbox ;
 MainLubeOilReservoirVolume := fb_MainLubeOilReservoirVolume.ReservoirVolume ;
 MainLubeOilCurrentPipeVolume := fb_MainLubeOilReservoirVolume.CurrentPipeVolume ;
-MainLubeOilPumpFlow := fb_MainLubeOilPumpFlow.PumpFlow ;
-
-]]></ST>
+MainLubeOilPumpFlow := fb_MainLubeOilPumpFlow.PumpFlow ;]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="133" Count="0" />
@@ -130,8 +128,6 @@ MainLubeOilPumpFlow := fb_MainLubeOilPumpFlow.PumpFlow ;
       <LineId Id="138" Count="0" />
       <LineId Id="171" Count="0" />
       <LineId Id="169" Count="0" />
-      <LineId Id="253" Count="0" />
-      <LineId Id="252" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
